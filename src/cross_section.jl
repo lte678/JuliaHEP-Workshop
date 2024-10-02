@@ -42,10 +42,11 @@ julia> differential_cross_section(E_in, cos_theta)
 # References
 - Schwartz 2014: M.D. Schwartz, "Quantum Field Theory and the Standard Model", Cambridge University Press, New York (2014)
 """
-function differential_cross_section(E_in, cos_theta)
-    α = ALPHA
-    m_e = ELECTRON_MASS
-    m_μ = MUON_MASS
+function differential_cross_section(E_in :: T1, cos_theta :: T2) where {T1 <: Real, T2 <: Real}
+    T = promote_type(T1, T2)
+    α = convert(T, ALPHA)    
+    m_e = convert(T, ELECTRON_MASS)
+    m_μ = convert(T, MUON_MASS)
     ρ_e = _rho(E_in, m_e)
     ρ_μ = _rho(E_in, m_μ)
     # Return
@@ -84,14 +85,15 @@ julia> total_cross_section(E_in)
 
 ```
 """
-function total_cross_section(E_in)
-    α = ALPHA
-    m_e = ELECTRON_MASS
-    m_μ = MUON_MASS
+function total_cross_section(E_in :: T) where {T <: Real}
+    α = convert(T, ALPHA)    
+    m_e = convert(T, ELECTRON_MASS)
+    m_μ = convert(T, MUON_MASS)
+    pi = convert(T, π)
     ρ_e = _rho(E_in, m_e)
     ρ_μ = _rho(E_in, m_μ)
     # Return
-    (ρ_μ*π*α^2/(ρ_e*8*E_in^6)) * (2E_in^4 + (2/3)ρ_e^2*ρ_μ^2 + 2E_in^2*(m_e^2 + m_μ^2))
+    (ρ_μ*pi*α^2/(ρ_e*8*E_in^6)) * (2E_in^4 + 2*ρ_e^2*ρ_μ^2/3 + 2E_in^2*(m_e^2 + m_μ^2))
 end
 
 
