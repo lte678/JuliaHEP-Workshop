@@ -54,9 +54,10 @@ Event e-e+ -> mu-mu+
 ```
 """
 struct Event{T}
-    #
-    # FIXME: add in more fields here
-    #
+    electron_momentum::FourMomentum{T}
+    positron_momentum::FourMomentum{T}
+    muon_momentum::FourMomentum{T}
+    anti_muon_momentum::FourMomentum{T}
     weight::T
 
     function Event(
@@ -66,9 +67,22 @@ struct Event{T}
         anti_muon_momentum::FourMomentum{T},
         weight::T) where {T<:Real}
 
-        #
-        # FIXME: add some validation 
-        #
+        if weight < 0.0
+            throw(ArgumentError("Only positve weights are permitted"))
+        end
+        # Only positive energies
+        @assert electron_momentum.en >= 0.0
+        @assert positron_momentum.en >= 0.0
+        @assert muon_momentum.en >= 0.0
+        @assert anti_muon_momentum.en >= 0.0
+        # Conservation of momentum
+        @assert electron_momentum.x + positron_momentum.x ≈ 0.0
+        @assert electron_momentum.y + positron_momentum.y ≈ 0.0
+        @assert electron_momentum.z + positron_momentum.z ≈ 0.0
+        @assert muon_momentum.x + anti_muon_momentum.x ≈ 0.0
+        @assert muon_momentum.y + anti_muon_momentum.y ≈ 0.0
+        @assert muon_momentum.z + anti_muon_momentum.z ≈ 0.0
+
         return new{T}(electron_momentum,positron_momentum,muon_momentum,anti_muon_momentum,weight)
     end
 end
@@ -78,9 +92,7 @@ Event(d::Dict,weight) = Event(d["e-"],d["e+"],d["mu-"],d["mu+"],weight)
 
 # construct event from coordinates
 function Event(E_in::Real,cos_theta::Real,phi::Real,weight::Real)
-    #
-    # FIXME: add me 
-    #
+    Event(coords_to_dict(E_in, cos_theta, phi), weight)
 end
 
 # easy access of element type
